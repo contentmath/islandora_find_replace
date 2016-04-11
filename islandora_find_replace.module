@@ -1,0 +1,366 @@
+<?php
+
+/**
+ * @file
+ * Main module file for Islandora Find & Replace.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_find_replace_menu() {
+  $items = array();
+  $items['admin/islandora/tools/find-replace/find'] = array(
+    'title' => 'Find & Replace',
+    'description' => 'Search for instances of text.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_find_replace_find_form'),
+    'access arguments' => array('use islandora find & replace'),
+    'file' => 'includes/find.form.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/islandora/tools/find-replace/log'] = array(
+    'title' => 'Find & Replace Logs',
+    'description' => 'Log of Find & Replace datastream modifications',
+    'page callback' => 'islandora_find_replace_operation_logs',
+    'access arguments' => array('use islandora find & replace'),
+    'file' => 'includes/logs.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/islandora/tools/find-replace/replace/%islandora_find_replace'] = array(
+    'title' => 'Find & Replace Text',
+    'description' => 'Replace instances of text.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_find_replace_replace_form', 5),
+    'access arguments' => array('use islandora find & replace'),
+    'file' => 'includes/replace.form.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/islandora/tools/find-replace/log/%islandora_find_replace'] = array(
+    'title' => 'Find & Replace Operation Log',
+    'description' => 'Log of Find & Replace datastream modifications',
+    'page callback' => 'islandora_find_replace_operation_log',
+    'page arguments' => array(5),
+    'access arguments' => array('use islandora find & replace'),
+    'file' => 'includes/log.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/islandora/tools/find-replace/replace/%islandora_find_replace/%islandora_object/preview'] = array(
+    'title' => 'Preview Change',
+    'description' => 'Preview how the datastream will change.',
+    'page callback' => 'islandora_find_replace_preview',
+    'page arguments' => array(5, 6),
+    'access callback' => 'islandora_find_replace_preview_access',
+    'access arguments' => array(5, 6),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Loads the data for a find & replace operation.
+ *
+ * @param int $id
+ *   The record's ID.
+ *
+ * @return array
+ *   The database row as an array.
+ */
+function islandora_find_replace_load($id) {
+  return db_query("SELECT * FROM {islandora_find_replace} WHERE id = :id LIMIT 1",
+    array(':id' => $id))->fetchAssoc();
+}
+
+/**
+ * Implements hook_permission().
+ */
+function islandora_find_replace_permission() {
+  return array(
+    'use islandora find & replace' => array(
+      'title' => t('Use the Islandora Find & Replace form'),
+      'description' => t('Users will also need permission to modify each object. Users will be able to view all Find & Replace logs.'),
+    ),
+  );
+}
+
+/**
+ * Access callback for the datastream diff preview.
+ *
+ * @param array $find_replace
+ *   The find & replace operation data.
+ * @param FedoraObject $object
+ *   The Fedora object.
+ *
+ * @return bool
+ *   TRUE if the user has access.
+ */
+function islandora_find_replace_preview_access($find_replace, $object) {
+  if (!module_exists('islandora_pretty_text_diff')) {
+    return FALSE;
+  }
+
+  if (!user_access('use islandora find & replace')) {
+    return FALSE;
+  }
+
+  if (user_access('view datastream diff') && islandora_datastream_access(ISLANDORA_VIEW_DATASTREAM_HISTORY, $object[$find_replace['dsid']])) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Make a Unix timestamp for the start or end of a day.
+ *
+ * @param array $date
+ *   From the Drupal date form element value.
+ * @param bool $start
+ *   TRUE if requesting the start of the day.
+ *
+ * @return int
+ *   The Unix timestamp.
+ */
+function _islandora_find_replace_timestamp_from_form_date($date, $start = TRUE) {
+  if ($start) {
+    return gmmktime(0, 0, 0, $date['month'], $date['day'], $date['year']);
+  }
+  else {
+    return gmmktime(23, 59, 59, $date['month'], $date['day'], $date['year']);
+  }
+}
+
+/**
+ * Batch operation to filter potential objects to perform the text replacement.
+ *
+ * @param array $candidate
+ *   Potential object found with the SPARQL query.
+ * @param string $dsid
+ *   The datastream ID for the operation.
+ * @param string $search
+ *   The search ("find") string for the operation.
+ * @param int $submission_id
+ *   The database ID for this submission/operation.
+ * @param array $context
+ *   Batch context.
+ */
+function islandora_find_replace_get_targets($candidate, $dsid, $search, $submission_id, &$context) {
+  if (!isset($context['results']['submission_id'])) {
+    $context['results']['submission_id'] = $submission_id;
+  }
+  $object = islandora_object_load($candidate['object']);
+
+  if (isset($object[$dsid]) && $count = substr_count($object[$dsid]->content, $search)) {
+    if (islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object[$dsid])) {
+      $candidate['count'] = $count;
+      $context['results']['find_results'][] = $candidate;
+    }
+  }
+}
+
+/**
+ * The completion callback for the "find" batch.
+ *
+ * @param bool $success
+ *   If the batch successfully completed.
+ * @param array $results
+ *   An array of result data.
+ * @param array $operations
+ *   Unprocessed operations if $success is FALSE.
+ */
+function islandora_find_replace_find_complete($success, $results, $operations) {
+  $find_replace = islandora_find_replace_load($results['submission_id']);
+  if (isset($results['find_results'])) {
+    $find_results = $results['find_results'];
+  }
+  else {
+    $find_results = array();
+  }
+  $find_replace['find_results'] = $find_results;
+  $find_replace['state'] = 'search';
+  drupal_write_record('islandora_find_replace', $find_replace, 'id');
+}
+
+/**
+ * Batch operation to perform find & replace on an object.
+ *
+ * @param string $pid
+ *   The object's PID.
+ * @param string $dsid
+ *   The datastream ID to operate on.
+ * @param string $search
+ *   The search string that will be replaced.
+ * @param string $replace
+ *   The replacement string.
+ * @param int $id
+ *   The find & replace submission/operation ID.
+ * @param array $context
+ *   The batch context.
+ */
+function islandora_find_replace_update_objects($pid, $dsid, $search, $replace, $id, &$context) {
+  if (!isset($context['results']['submission_id'])) {
+    $context['results']['submission_id'] = $id;
+  }
+  $object = islandora_object_load($pid);
+  $success = FALSE;
+  if (isset($object[$dsid]) && islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object[$dsid])) {
+    try {
+      $location_before = $object[$dsid]->location;
+      $content = islandora_find_replace_string_replace($search, $replace, $object[$dsid]->content);
+      $object[$dsid]->setContentFromString($content);
+
+      $location_after = $object[$dsid]->location;
+      // If successful, track the version.
+      if ($location_before != $location_after) {
+        $success = TRUE;
+      }
+    }
+    catch (Exception $e) {
+
+    }
+  }
+
+  $find_replace = islandora_find_replace_load($id);
+  $revisions = unserialize($find_replace['revisions']);
+
+  if ($success) {
+    if (!isset($revisions['success'])) {
+      $revisions['success'] = array();
+    }
+    $revisions['success'][$pid] = array('before' => $location_before, 'after' => $location_after);
+  }
+  else {
+    if (!isset($revisions['fail'])) {
+      $revisions['fail'] = array();
+    }
+    $revisions['fail'][] = $pid;
+  }
+  $find_replace['revisions'] = $revisions;
+  drupal_write_record('islandora_find_replace', $find_replace, 'id');
+}
+
+/**
+ * The completion callback for the "replace" batch.
+ *
+ * @param bool $success
+ *   If the batch successfully completed.
+ * @param array $results
+ *   An array of result data.
+ * @param array $operations
+ *   Unprocessed operations if $success is FALSE.
+ */
+function islandora_find_replace_update_complete($success, $results, $operations) {
+  db_update('islandora_find_replace')
+    ->fields(array('state' => 'complete'))
+    ->condition('id', $results['submission_id'])
+    ->execute();
+  drupal_set_message(t('Find and Replace complete!'));
+}
+
+/**
+ * Peform a string replacement.
+ *
+ * @param string $search
+ *   The search/find string.
+ * @param string $replace
+ *   The replacement string.
+ * @param string $content
+ *   The target string for the operation.
+ *
+ * @return mixed
+ *   The modified string if successful.
+ */
+function islandora_find_replace_string_replace($search, $replace, $content) {
+  if ($replace == '(empty)') {
+    $replace = '';
+  }
+  return str_replace($search, $replace, $content);
+}
+
+/**
+ * Find objects to perform the find/replace operation based on user form values.
+ *
+ * @param string $model
+ *   The content model PID that the operation should apply to.
+ * @param bool|string $collection
+ *   The collection PID if the user selects a collection.
+ * @param bool|string $date_property
+ *   The type of date filter to apply if the user has selected.
+ * @param bool|string $date_from
+ *   The start date for the date filter if selected.
+ * @param bool|string $date_to
+ *   The end date for the date filter if selected.
+ *
+ * @return array
+ *   An array of SPARQL results.
+ */
+function islandora_find_replace_query($model, $collection = FALSE, $date_property = FALSE, $date_from = FALSE, $date_to = FALSE) {
+  $condition = '?object fm:hasModel <info:fedora/' . $model . '> ; ';
+
+  if ($collection) {
+    $condition .= 'fr:isMemberOfCollection <info:fedora/' . $collection . '> ; ';
+  }
+  if ($date_property) {
+    $from = _islandora_find_replace_timestamp_from_form_date($date_from);
+    $to = _islandora_find_replace_timestamp_from_form_date($date_to, FALSE);
+    $from = gmdate("Y-m-d\TH:i:s\Z", $from);
+    $to = gmdate("Y-m-d\TH:i:s\Z", $to);
+
+    $date_query = ($date_property == 'lastModifiedDate') ? 'fv:lastModifiedDate' : 'fm:createdDate';
+    $condition .= $date_query . ' ?date
+      FILTER ( ?date >= xsd:dateTime("' . $from . '") && ?date <= xsd:dateTime("' . $to . '"))';
+  }
+  $tuque = islandora_get_tuque_connection();
+  $query = "PREFIX fm: <" . FEDORA_MODEL_URI . ">
+            PREFIX fr: <" . FEDORA_RELS_EXT_URI . ">
+            PREFIX fv: <info:fedora/fedora-system:def/view#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            SELECT ?object ?label
+            FROM <#ri>
+            WHERE {
+              " . $condition . "
+              OPTIONAL{
+                ?object fm:label ?label
+              }
+           }";
+  $results = array();
+  $query_results = $tuque->repository->ri->sparqlQuery($query, 'unlimited');
+  foreach ($query_results as $result) {
+    $results[] = array('label' => $result['label']['value'], 'object' => $result['object']['value']);
+  }
+  return $results;
+}
+
+/**
+ * Page callback to preview the find & replace.
+ *
+ * @param array $find_replace
+ *   The database row for the operation.
+ * @param FedoraObject $object
+ *   The Fedora object to preview the change for.
+ *
+ * @return array
+ *   Rendered diff from the Islandora Pretty Text Diff module.
+ */
+function islandora_find_replace_preview($find_replace, $object) {
+  if (module_exists('islandora_pretty_text_diff')) {
+    $dsid = $find_replace['dsid'];
+    $datastream = $object[$dsid];
+    $content1 = $datastream->content;
+    $content2 = islandora_find_replace_string_replace(
+      $find_replace['find'],
+      $find_replace['replacement'],
+      $content1);
+    if (strpos($datastream->mimetype, 'xml') !== FALSE) {
+      return islandora_pretty_text_diff_content(
+        htmlentities($content1, ENT_NOQUOTES),
+        htmlentities($content2, ENT_NOQUOTES)
+      );
+    }
+    else {
+      return islandora_pretty_text_diff_content($content1, $content2);
+    }
+  }
+  else {
+    drupal_set_message(t('Islandora Pretty Text Diff is required'), 'warning');
+  }
+}

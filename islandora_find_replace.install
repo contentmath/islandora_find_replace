@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * @file
+ * Install file for Islandora Find & Replace.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function islandora_find_replace_schema() {
+  $schema['islandora_find_replace'] = array(
+    'description' => 'Storage of Islandora Find & Replace submissions',
+    'fields' => array(
+      'id' => array(
+        'description' => 'ID for the submission',
+        'type' => 'serial',
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'state' => array(
+        'type' => 'varchar',
+        'length' => 15,
+        'default' => NULL,
+        'description' => 'The state of the submission.',
+      ),
+      'cmodel' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => NULL,
+        'description' => 'The content model to search.',
+      ),
+      'dsid' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => NULL,
+        'description' => 'The datastream ID to be modified.',
+      ),
+      'find' => array(
+        'type' => 'text',
+        'size' => 'normal',
+        'description' => 'The text to search for.',
+        'default' => NULL,
+      ),
+      'replacement' => array(
+        'type' => 'text',
+        'size' => 'normal',
+        'description' => 'The text to replace with.',
+        'default' => NULL,
+      ),
+      'find_results' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of the results from the search operation.',
+      ),
+      'revisions' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'The datastream changes that were made.',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}

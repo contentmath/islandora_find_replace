@@ -1,0 +1,7 @@
+name = Islandora Find & Replace
+description = Simple module to find and replace strings in datastreams.
+dependencies[] = islandora
+dependencies[] = islandora_basic_collection
+core = 7.x
+version = 7.x-dev
+package = Islandora Tools

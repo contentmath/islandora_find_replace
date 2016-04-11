@@ -10,7 +10,7 @@ This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
-* [Islandora Pretty Text Diff](https://github.com/contentmath/islandora_pretty_text_diff)(optional)
+* [Islandora Pretty Text Diff](https://github.com/contentmath/islandora_pretty_text_diff) (optional)
 
 ## Installation
 
@@ -18,7 +18,7 @@ Follow the typical Drupal module installation instructions [here](https://drupal
 
 ## Documentation
 
-Further documentation for this module is available at [www.contentmath.com](https://www.contentmath.com).
+Further documentation for this module is available at [www.contentmath.com](http://www.contentmath.com).
 
 ## Troubleshooting/Issues
 
@@ -28,13 +28,13 @@ Have an issue with the module?
 
 Need support or additional features or modifications?
 
-* [Content Math](https://www.contentmath.com)
+* [Content Math](http://www.contentmath.com)
 
 ## Maintainers/Sponsors
 
 Current maintainers:
 
-* [Mitch MacKenzie](https://www.contentmath.com)
+* [Mitch MacKenzie](http://www.contentmath.com)
 
 ## License
 

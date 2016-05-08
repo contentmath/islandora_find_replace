@@ -44,7 +44,7 @@ function islandora_find_replace_find_form($form, &$form_state) {
   $collection_options = array();
   $collection_options[] = t('- Select -');
   foreach ($collections as $collection) {
-    $collection_options[$collection['pid']] = check_plain($collection['label']);
+    $collection_options[$collection['pid']] = check_plain($collection['label']) . ' - (' . $collection['pid'] . ')';
   }
   $form['find']['collection'] = array(
     '#type' => 'select',
@@ -89,17 +89,19 @@ function islandora_find_replace_find_form($form, &$form_state) {
   );
 
   $form['search'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Search text'),
     '#description' => t('The text to search for in the datastream.'),
     '#required' => TRUE,
+    '#rows' => 1,
   );
 
   $form['replace'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Replacement text'),
     '#description' => t('The text to replace the search with. Use (empty) to replace the search text with nothing.'),
     '#required' => TRUE,
+    '#rows' => 1,
   );
 
   $form['submit'] = array(

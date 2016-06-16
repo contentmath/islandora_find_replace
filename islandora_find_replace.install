@@ -62,11 +62,6 @@ function islandora_find_replace_schema() {
         'serialize' => TRUE,
         'description' => 'The datastream changes that were made.',
       ),
-      'date' => array(
-        'type' => 'date',
-        'not null' => FALSE,
-        'description' => 'The date of insert log',
-      ),
     ),
     'primary key' => array('id'),
   );

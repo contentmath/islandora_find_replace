@@ -257,10 +257,10 @@ function islandora_find_replace_update_objects($pid, $dsid, $search, $replace, $
  *   Unprocessed operations if $success is FALSE.
  */
 function islandora_find_replace_update_complete($success, $results, $operations) {
-  $date = date("Y-m-d H:i:s");
+  
       
   db_update('islandora_find_replace')
-    ->fields(array('state' => 'complete','date' => $date))
+    ->fields(array('state' => 'complete'))
     ->condition('id', $results['submission_id'])
     ->execute();
   drupal_set_message(t('Find and Replace complete!'));

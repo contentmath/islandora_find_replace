@@ -70,30 +70,31 @@ function generate_csv(){
   fputs($fh, $bom =( chr(0xEF) . chr(0xBB) . chr(0xBF) ));
   fputcsv($fh, array('ID','Content Model','Object ID','DSID','Find','Replace'));
  
-  
   foreach($operations as $operation) {
-    $objectIDs = '';
+    $objectID = '';
     $revisions = unserialize($operation->revisions);
     if (is_array($revisions) || is_object($revisions)){
      
       $numOfItem = count($revisions['success']);
-      $counter = 0;
+      //$counter = 0;
       foreach($revisions['success'] as $key => $value){ 
-        $objectIDs = $objectIDs . $key;
+        /*$objectIDs = $objectIDs . $key;
         if($counter < $numOfItem - 1){
           $objectIDs = $objectIDs."\r\n";
           $counter++;
-        } 
+        } */
+        $objectID = $key;
+        fputcsv($fh, array(
+          check_plain($operation->id),
+          check_plain($operation->cmodel),
+          $objectID,
+          check_plain($operation->dsid),
+          $operation->find,
+          $operation->replacement
+        ));
       }
     }
-    fputcsv($fh, array(
-      check_plain($operation->id),
-      check_plain($operation->cmodel),
-      $objectIDs,
-      check_plain($operation->dsid),
-      $operation->find,
-      $operation->replacement
-      ));
+    
   }
   // Close the output stream.
   fclose($fh);

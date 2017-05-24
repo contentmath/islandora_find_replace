@@ -24,7 +24,7 @@ The module will then start a batch process in the browser to find all of the obj
 
 The next step in the form allows the user to select which objects (or all) should be updated. If the Islandora Pretty Text Diff module is enabled (highly recommended), a link to a preview diff of the changes will be provided. Submitting this form will kick off the update batch process. After completion, a log will be displayed of successful updates.
 
-Please note that this module has the potential to edit tags and make datastreams invalid if used incorrectly, so it is recommended to test on sample data first and always ensure backups are up-to-date. The module will not operate on system critical datatstreams like RELS-EXT and POLICY.
+**Please note that this module has the potential to edit tags and make datastreams invalid if used incorrectly, so it is recommended to test on sample data first and always ensure backups are up-to-date. The module will not operate on system critical datatstreams like RELS-EXT and POLICY.**
 
 The find and replace operation respects Islandora's permissions, namespace restrictions, and XACML access to an object. The module does not update derivative datastreams, like the case of MODS transformations to Dublin Core. The derivative datastreams can be targeted with their own find and replace operation if this is problematic. Currently, this module does not have the functionality to update object labels.
 
@@ -32,20 +32,20 @@ A list of all completed Islandora Find & Replace operations can be found by visi
 
 ## Troubleshooting/Issues
 
-Have an issue with the module?
-
-* [Issue Queue](https://github.com/contentmath/islandora_find_replace/issues)
-
-Need support or additional features or modifications?
-
-* [Content Math](http://www.contentmath.com)
+We welcome issues in our [issue queue](https://github.com/Islandora-Collaboration-Group/islandora_find_replace/issues).
 
 ## Maintainers/Sponsors
 
 Current maintainers:
 
-* [Mitch MacKenzie](http://www.contentmath.com)
+* [Islandora Collaboration Group (ICG)](https://islandora-collaboration-group.github.io/)
 
 ## License
 
 [GPLv3](http://www.gnu.org/licenses/gpl-3.0.txt)
+
+## Acknowledgments
+
+* [@mitchmac](https://github.com/mitchmac) is responsible for the bulk of the Find & Replace code
+* Forked from [@cuhk-library](https://github.com/cuhk-library/islandora_find_replace)
+* Updated at ICG hack/doc at Williams College, May 2017

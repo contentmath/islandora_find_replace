@@ -26,7 +26,7 @@ The next step in the form allows the user to select which objects (or all) shoul
 
 Please note that this module has the potential to make invalid datastreams if used incorrectly, so it is recommended to test on sample data first and always ensure backups are up-to-date. The module will not operate on system critical datatstreams like RELS-EXT and POLICY.
 
-The find and replace operation respects Islandora's permissions, namespace restrictions, and XACML access to an object. The module does not update derivative datastreams, like the case of MODS transformations to Dublin Core. The derivative datastreams can be targeted with their own find and replace operation if this is problematic.
+The find and replace operation respects Islandora's permissions, namespace restrictions, and XACML access to an object. The module does not update derivative datastreams, like the case of MODS transformations to Dublin Core. The derivative datastreams can be targeted with their own find and replace operation if this is problematic. Currently, this module does not have the functionality to update object labels.
 
 A list of all completed Islandora Find & Replace operations can be found by visiting the admin/islandora/tools/find-replace/log URL on your Islandora installation.
 

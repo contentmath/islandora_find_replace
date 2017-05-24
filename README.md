@@ -10,7 +10,7 @@ This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
-* [Islandora Pretty Text Diff](https://github.com/contentmath/islandora_pretty_text_diff)
+* [Islandora Pretty Text Diff](https://github.com/contentmath/islandora_pretty_text_diff) (not a dependency but highly recommended)
 
 ## Installation
 

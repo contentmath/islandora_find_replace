@@ -39,7 +39,11 @@ function islandora_find_replace_find_form($form, &$form_state) {
     '#options' => $cmodel_options,
     '#required' => TRUE,
   );
-
+  $form['find']['namespace'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Namespace'),
+    '#description' => t('A single namespace to search for the string.'),
+  );
   $collections = islandora_basic_collection_get_collections();
   $collection_options = array();
   $collection_options[] = t('- Select -');
@@ -150,6 +154,7 @@ function islandora_find_replace_find_form_validate($form, &$form_state) {
  */
 function islandora_find_replace_find_form_submit($form, &$form_state) {
   $candidates = islandora_find_replace_query($form_state['values']['content_model'],
+    $form_state['values']['namespace'],
     $form_state['values']['collection'],
     $form_state['values']['date_property'],
     $form_state['values']['date_from'],
@@ -158,6 +163,7 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
 
   $find_replace = array(
     'cmodel' => $form_state['values']['content_model'],
+    'namespace' => $form_state['values']['namespace'],
     'dsid' => $form_state['values']['dsid'],
     'find' => $form_state['values']['search'],
     'replacement' => $form_state['values']['replace'],

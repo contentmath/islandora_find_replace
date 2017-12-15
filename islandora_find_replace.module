@@ -293,12 +293,17 @@ function islandora_find_replace_string_replace($search, $replace, $content) {
  * @return array
  *   An array of SPARQL results.
  */
-function islandora_find_replace_query($model, $collection = FALSE, $date_property = FALSE, $date_from = FALSE, $date_to = FALSE) {
+function islandora_find_replace_query($model, $namespace = FALSE, $collection = FALSE, $date_property = FALSE, $date_from = FALSE, $date_to = FALSE) {
   $condition = '?object fm:hasModel <info:fedora/' . $model . '> ; ';
 
   if ($collection) {
     $condition .= 'fr:isMemberOfCollection <info:fedora/' . $collection . '> ; ';
   }
+
+  if ($namespace) {
+    $condition .= 'FILTER(REGEX(STR(?object), "^info:fedora/' . $namespace . ':"))';
+  }
+
   if ($date_property) {
     $from = _islandora_find_replace_timestamp_from_form_date($date_from);
     $to = _islandora_find_replace_timestamp_from_form_date($date_to, FALSE);

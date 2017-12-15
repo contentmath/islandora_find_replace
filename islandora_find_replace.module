@@ -281,6 +281,8 @@ function islandora_find_replace_string_replace($search, $replace, $content) {
  *
  * @param string $model
  *   The content model PID that the operation should apply to.
+ * @param string $namespace
+ *   The namespace to limit results to.
  * @param bool|string $collection
  *   The collection PID if the user selects a collection.
  * @param bool|string $date_property

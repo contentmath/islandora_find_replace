@@ -27,6 +27,14 @@ function islandora_find_replace_menu() {
     'file' => 'includes/logs.inc',
     'type' => MENU_NORMAL_ITEM,
   );
+  $items['admin/islandora/tools/find-replace/log/get_csv'] = array(
+    'title' => 'Generate CSV Log',
+    'description' => 'Gererate CSV Log file',
+    'page callback' => 'generate_csv',
+    'access arguments' => array('use islandora find & replace'),
+    'file' => 'includes/logs.inc',
+    'type' => MENU_LOCAL_ACTION,
+  );
   $items['admin/islandora/tools/find-replace/replace/%islandora_find_replace'] = array(
     'title' => 'Find & Replace Text',
     'description' => 'Replace instances of text.',
@@ -249,6 +257,8 @@ function islandora_find_replace_update_objects($pid, $dsid, $search, $replace, $
  *   Unprocessed operations if $success is FALSE.
  */
 function islandora_find_replace_update_complete($success, $results, $operations) {
+  
+      
   db_update('islandora_find_replace')
     ->fields(array('state' => 'complete'))
     ->condition('id', $results['submission_id'])

@@ -152,6 +152,7 @@ function islandora_find_replace_get_targets($candidate, $dsid, $search, $isregex
   $object = islandora_object_load($candidate['object']);
   if ($isregex) {
     $count = preg_match_all($search, $object[$dsid]->content);
+    dpm(preg_match_all($search, $object[$dsid]->content));
   }
   else {
     $count = substr_count($object[$dsid]->content, $search);
@@ -299,7 +300,7 @@ function islandora_find_replace_string_replace($search, $replace, $content) {
  *   The search/find string.
  * @param string $replace
  *   The replacement string.
- * @param string $content
+ * @param string $content 
  *   The target string for the operation.
  *
  * @return mixed
@@ -309,6 +310,10 @@ function islandora_find_replace_regex_replace($pattern, $replace, $content) {
   if ($replace == '(empty)') {
     $replace = '';
   }
+  dpm($pattern);
+  dpm($replace);
+  dpm($content);
+  dpm(preg_replace($pattern, $replace, $content));
   return preg_replace($pattern, $replace, $content);
 }
 

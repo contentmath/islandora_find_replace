@@ -200,7 +200,6 @@ function islandora_find_replace_find_form_validate($form, &$form_state) {
     // Verify that pattern starts and ends with 
     try {
       $matches = preg_replace($val['preg_pattern'], $val['preg_replacement'], '');
-      dpm(var_dump($matches, true));
       $regexerror =  $matches === NULL ? true: false;
     }
     catch(Exception $e) {

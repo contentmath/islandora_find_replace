@@ -105,6 +105,9 @@ function islandora_find_replace_find_form($form, &$form_state) {
     '#description' => t('The regular expresion to evaluate in the datastream.'),
     '#rows' => 1,
     '#states' => array(
+      'required' => array(
+        ':input[name="regex"]' => array('checked' => TRUE),
+       ),
        'invisible' => array(
          ':input[name="regex"]' => array('checked' => FALSE),
        ),
@@ -117,6 +120,9 @@ function islandora_find_replace_find_form($form, &$form_state) {
     '#description' => t('The replacement expression against your matched pattern'),
     '#rows' => 1,
     '#states' => array(
+      'required' => array(
+        ':input[name="regex"]' => array('checked' => TRUE),
+       ),
        'invisible' => array(
          ':input[name="regex"]' => array('checked' => FALSE),
        ),
@@ -128,12 +134,14 @@ function islandora_find_replace_find_form($form, &$form_state) {
     '#type' => 'textarea',
     '#title' => t('Search text'),
     '#description' => t('The text to search for in the datastream.'),
-    '#required' => TRUE,
     '#rows' => 1,
     '#states' => array(
-       'invisible' => array(
-         ':input[name="regex"]' => array('checked' => TRUE),
-       ),
+      'required' => array(
+        ':input[name="regex"]' => array('checked' => FALSE),
+      ),
+      'invisible' => array(
+        ':input[name="regex"]' => array('checked' => TRUE),
+      ),
     ),
   );
 
@@ -141,12 +149,14 @@ function islandora_find_replace_find_form($form, &$form_state) {
     '#type' => 'textarea',
     '#title' => t('Replacement text'),
     '#description' => t('The text to replace the search with. Use (empty) to replace the search text with nothing.'),
-    '#required' => TRUE,
     '#rows' => 1,
     '#states' => array(
-       'invisible' => array(
-         ':input[name="regex"]' => array('checked' => TRUE),
-       ),
+      'required' => array(
+        ':input[name="regex"]' => array('checked' => FALSE),
+      ),
+      'invisible' => array(
+        ':input[name="regex"]' => array('checked' => TRUE),
+      ),
     ),
   );
 
@@ -195,7 +205,7 @@ function islandora_find_replace_find_form_validate($form, &$form_state) {
     catch(Exception $e) {
       $regexerror = true;
     }
-    if ($regexerror) {   
+    if ($regexerror) {
        form_set_error('preg_pattern', t('Please check your regex pattern for errors'));
        form_set_error('preg_replacement', t('Please check your regex replacement for errors'));
     }
@@ -228,7 +238,6 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
     'isregex' => $isregex ,
     'state' => 'submitted',
   );
-  dpm($candidates);
   if (empty($candidates)) {
     $form_state['rebuild'] = true;
     drupal_set_message(t('Sorry, no matching candidates found to which to search against. Please try another combination'),'status');

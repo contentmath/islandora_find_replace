@@ -176,6 +176,7 @@ function islandora_find_replace_get_targets($candidate, $dsid, $search, $isregex
  *   Unprocessed operations if $success is FALSE.
  */
 function islandora_find_replace_find_complete($success, $results, $operations) {
+
   $find_replace = islandora_find_replace_load($results['submission_id']);
   if (isset($results['find_results'])) {
     $find_results = $results['find_results'];

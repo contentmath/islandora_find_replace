@@ -231,7 +231,7 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
   dpm($candidates);
   if (empty($candidates)) {
     $form_state['rebuild'] = true;
-    drupal_set_message(t('Sorry, no matching candidates found to which to search against. Please try another combination'),'notice');
+    drupal_set_message(t('Sorry, no matching candidates found to which to search against. Please try another combination'),'status');
     return;
   }
   drupal_write_record('islandora_find_replace', $find_replace);
@@ -244,7 +244,7 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
         $candidate,
         $form_state['values']['dsid'],
         $form_state['values']['search'],
-        $form_state['values']['isregex'],
+        $isregex,
         $find_replace['id'],
       ),
     );

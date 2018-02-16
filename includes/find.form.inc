@@ -217,6 +217,8 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
     $form_state['values']['date_from'],
     $form_state['values']['date_to']
   );
+  
+  
   $isregex = $form_state['values']['regex'];
   $find_replace = array(
     'cmodel' => $form_state['values']['content_model'],
@@ -226,6 +228,12 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
     'isregex' => $isregex ,
     'state' => 'submitted',
   );
+  dpm($candidates);
+  if (empty($candidates)) {
+    $form_state['rebuild'] = true;
+    drupal_set_message(t('Sorry, no matching candidates found to which to search against. Please try another combination'),'notice');
+    return;
+  }
   drupal_write_record('islandora_find_replace', $find_replace);
 
   $operations = array();

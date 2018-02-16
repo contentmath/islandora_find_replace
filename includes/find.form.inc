@@ -230,11 +230,13 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
   
   
   $isregex = $form_state['values']['regex'];
+  $searchfor = !$isregex ? $form_state['values']['search'] : $form_state['values']['preg_pattern'];
+  $replacewith = !$isregex ? $form_state['values']['replace'] : $form_state['values']['preg_replacement'];
   $find_replace = array(
     'cmodel' => $form_state['values']['content_model'],
     'dsid' => $form_state['values']['dsid'],
-    'find' => !$isregex ? $form_state['values']['search'] : $form_state['values']['preg_pattern'],
-    'replacement' => !$isregex ? $form_state['values']['replace'] : $form_state['values']['preg_replacement'],
+    'find' => $searchfor,
+    'replacement' => $replacewith,
     'isregex' => $isregex ,
     'state' => 'submitted',
   );
@@ -252,7 +254,7 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
       array(
         $candidate,
         $form_state['values']['dsid'],
-        $form_state['values']['search'],
+        $searchfor,
         $isregex,
         $find_replace['id'],
       ),

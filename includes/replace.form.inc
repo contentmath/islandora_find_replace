@@ -94,6 +94,7 @@ function islandora_find_replace_replace_form_submit($form, &$form_state) {
       $form_state['storage']['find_replace']['dsid'],
       $form_state['storage']['find_replace']['find'],
       $form_state['storage']['find_replace']['replacement'],
+      $form_state['storage']['find_replace']['isregex'],
       $form_state['storage']['find_replace']['id']),
     );
   }

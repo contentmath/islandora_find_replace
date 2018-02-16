@@ -138,18 +138,26 @@ function _islandora_find_replace_timestamp_from_form_date($date, $start = TRUE) 
  *   The datastream ID for the operation.
  * @param string $search
  *   The search ("find") string for the operation.
+ * @param bool $isregex
+ *   True if search value is a regex pattern.
  * @param int $submission_id
  *   The database ID for this submission/operation.
  * @param array $context
  *   Batch context.
  */
-function islandora_find_replace_get_targets($candidate, $dsid, $search, $submission_id, &$context) {
+function islandora_find_replace_get_targets($candidate, $dsid, $search, $isregex, $submission_id, &$context) {
   if (!isset($context['results']['submission_id'])) {
     $context['results']['submission_id'] = $submission_id;
   }
   $object = islandora_object_load($candidate['object']);
+  if ($isregex) {
+    $count = preg_match_all($search, $object[$dsid]->content);
+  }
+  else {
+    $count = substr_count($object[$dsid]->content, $search);
+  }
 
-  if (isset($object[$dsid]) && $count = substr_count($object[$dsid]->content, $search)) {
+  if (isset($object[$dsid]) && $count) {
     if (islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object[$dsid])) {
       $candidate['count'] = $count;
       $context['results']['find_results'][] = $candidate;
@@ -191,12 +199,14 @@ function islandora_find_replace_find_complete($success, $results, $operations) {
  *   The search string that will be replaced.
  * @param string $replace
  *   The replacement string.
+ * @param bool $isregex
+ *   True if search value is a regex pattern.
  * @param int $id
  *   The find & replace submission/operation ID.
  * @param array $context
  *   The batch context.
  */
-function islandora_find_replace_update_objects($pid, $dsid, $search, $replace, $id, &$context) {
+function islandora_find_replace_update_objects($pid, $dsid, $search, $replace, $isregex, $id, &$context) {
   if (!isset($context['results']['submission_id'])) {
     $context['results']['submission_id'] = $id;
   }
@@ -205,7 +215,12 @@ function islandora_find_replace_update_objects($pid, $dsid, $search, $replace, $
   if (isset($object[$dsid]) && islandora_datastream_access(ISLANDORA_METADATA_EDIT, $object[$dsid])) {
     try {
       $location_before = $object[$dsid]->location;
-      $content = islandora_find_replace_string_replace($search, $replace, $object[$dsid]->content);
+      if ($isregex) {
+        $content = islandora_find_replace_regex_replace($search, $replace, $object[$dsid]->content);
+      } 
+      else {
+        $content = islandora_find_replace_string_replace($search, $replace, $object[$dsid]->content);
+      }
       $object[$dsid]->setContentFromString($content);
 
       $location_after = $object[$dsid]->location;
@@ -274,6 +289,26 @@ function islandora_find_replace_string_replace($search, $replace, $content) {
     $replace = '';
   }
   return str_replace($search, $replace, $content);
+}
+
+/**
+ * Peform a preg_replace replacement.
+ *
+ * @param string $search
+ *   The search/find string.
+ * @param string $replace
+ *   The replacement string.
+ * @param string $content
+ *   The target string for the operation.
+ *
+ * @return mixed
+ *   The modified string if successful.
+ */
+function islandora_find_replace_regex_replace($pattern, $replace, $content) {
+  if ($replace == '(empty)') {
+    $replace = '';
+  }
+  return preg_replace($pattern, $replace, $content);
 }
 
 /**
@@ -346,10 +381,19 @@ function islandora_find_replace_preview($find_replace, $object) {
     $dsid = $find_replace['dsid'];
     $datastream = $object[$dsid];
     $content1 = $datastream->content;
+
+    if ($find_replace['isregex']) {
+      $content2 = islandora_find_replace_regex_replace(
+        $find_replace['find'],
+        $find_replace['replacement'],
+        $content1);
+    }
+    else {
     $content2 = islandora_find_replace_string_replace(
       $find_replace['find'],
       $find_replace['replacement'],
       $content1);
+    }
     if (strpos($datastream->mimetype, 'xml') !== FALSE) {
       return islandora_pretty_text_diff_content(
         htmlentities($content1, ENT_NOQUOTES),

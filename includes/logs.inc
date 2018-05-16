@@ -21,6 +21,7 @@ function islandora_find_replace_operation_logs() {
     t('DSID'),
     t('Find'),
     t('Replace'),
+    t('Was regex'),
   );
   $rows = array();
   foreach ($operations as $operation) {
@@ -38,6 +39,7 @@ function islandora_find_replace_operation_logs() {
       check_plain($operation->dsid),
       check_plain($operation->find),
       check_plain($operation->replacement),
+      check_plain($operation->isregex) == 1 ? 'YES' : 'NO',
     );
   }
   

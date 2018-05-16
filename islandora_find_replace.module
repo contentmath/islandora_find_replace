@@ -305,7 +305,7 @@ function islandora_find_replace_string_replace($search, $replace, $content) {
  * @return array
  *   An array of SPARQL results.
  */
-function islandora_find_replace_query($model, $namespace = FALSE, $collection = FALSE, $date_property = FALSE, $date_from = FALSE, $date_to = FALSE) {
+function islandora_find_replace_query($model, $collection = FALSE, $date_property = FALSE, $date_from = FALSE, $date_to = FALSE, $namespace = FALSE) {
   $condition = '?object fm:hasModel <info:fedora/' . $model . '> ; ';
 
   if ($collection) {

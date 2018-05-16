@@ -32,13 +32,13 @@ A list of all completed Islandora Find & Replace operations can be found by visi
 
 ## Troubleshooting/Issues
 
-We welcome issues in our [issue queue](https://github.com/Islandora-Collaboration-Group/islandora_find_replace/issues).
+We welcome issues in our [issue queue](https://github.com/mnylc/islandora_find_replace/issues).
 
 ## Maintainers/Sponsors
 
 Current maintainers:
 
-* [Islandora Collaboration Group (ICG)](https://islandora-collaboration-group.github.io/)
+* [Diego Pino](https://github.com/DiegoPino/)
 
 ## License
 

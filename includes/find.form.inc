@@ -95,7 +95,7 @@ function islandora_find_replace_find_form($form, &$form_state) {
   $form['search'] = array(
     '#type' => 'textarea',
     '#title' => t('Search text'),
-    '#description' => t('The text to search for in the datastream.'),
+    '#description' => t('The text to search for in the datastream. Special characters must be escaped.'),
     '#required' => TRUE,
     '#rows' => 1,
   );
@@ -103,7 +103,8 @@ function islandora_find_replace_find_form($form, &$form_state) {
   $form['replace'] = array(
     '#type' => 'textarea',
     '#title' => t('Replacement text'),
-    '#description' => t('The text to replace the search with. Use (empty) to replace the search text with nothing.'),
+    '#description' => t('The text to replace the search with. Special characters must be escaped. 
+      Use (empty) to replace the search text with nothing.'),
     '#required' => TRUE,
     '#rows' => 1,
   );
@@ -163,7 +164,7 @@ function islandora_find_replace_find_form_submit($form, &$form_state) {
 
   $find_replace = array(
     'cmodel' => $form_state['values']['content_model'],
-    'namespace' => $form_state['values']['namespace'],
+    'namespace' => trim($form_state['values']['namespace']),
     'dsid' => $form_state['values']['dsid'],
     'find' => $form_state['values']['search'],
     'replacement' => $form_state['values']['replace'],

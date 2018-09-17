@@ -65,6 +65,10 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
     '#empty' => l(t('No matching objects were found. Search again.'),
       'admin/islandora/tools/find-replace/find'),
   );
+  $form['process_all'] =  array(
+    '#type' => 'checkbox',
+    '#title' => t('Check here to process all found results(cannot be undone!)'),
+  );
 
   if (count($options)) {
     $form['submit'] = array(
@@ -85,7 +89,7 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
  *   The form state array.
  */
 function islandora_find_replace_replace_form_submit($form, &$form_state) {
-  $selected = array_keys(array_filter($form_state['values']['preview']));
+  $selected = $form_state['values']['process_all'] ? array_keys($form_state['values']['preview']) : array_keys(array_filter($form_state['values']['preview']));
 
   $operations = array();
   foreach ($selected as $select) {

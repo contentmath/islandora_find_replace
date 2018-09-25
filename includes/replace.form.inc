@@ -64,6 +64,7 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
     '#options' => $options,
     '#empty' => l(t('No matching objects were found. Search again.'),
       'admin/islandora/tools/find-replace/find'),
+    '#js_select' => FALSE,
   );
   $form['process_all'] =  array(
     '#type' => 'checkbox',

@@ -65,11 +65,11 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
   $php_max_input_vars = ini_get('max_input_vars');
   $form['warning'] = array(
     '#type' => 'markup',
-    '#markup' => "<p>" . "If your set of items is larger than " . $php_max_input_vars . " you can use the 'Process All' button. Alternatively you should refine your search or only apply less than " . $php_max_input_vars . " items per batch</p>"
+    '#markup' => "<p></p>"
   );
   $form['process_all'] =  array(
     '#type' => 'checkbox',
-    '#title' => t('Check here to process all found results(cannot be undone!)'),
+    '#title' => t("If set of selected results is larger than the limit of $php_max_input_vars items, you may process all items by checking this box."),
   );
   if (count($options)) {
     $form['submit'] = array(

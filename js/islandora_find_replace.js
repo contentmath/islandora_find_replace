@@ -33,7 +33,8 @@ markup = `<div id="console" class="clearfix"><div id="find_replace_warning" clas
         }
       }
       $('#edit-process-all').change(function(){
-        if(this.checked === true){
+        if(this.checked === true) {
+          $('.form-checkbox.in_tableselect').attr('checked', false);
           $('#selectall.form-checkbox').attr('checked', false);
           $('.select-all').children().attr('checked', false);
           $('tbody').children().removeClass('selected');
@@ -45,9 +46,12 @@ markup = `<div id="console" class="clearfix"><div id="find_replace_warning" clas
         $('.form-checkbox').tooManySelected();
       });
 
-      $('.form-checkbox').change(function(){
-        if(this.click) {
+      $('.form-checkbox.in_tableselect').change(function(){
+        if (this.click) {
           $('.form-checkbox').tooManySelected();
+        }
+        if (this.checked === true) {
+          $('#edit-process-all').attr('checked', false);
         }
       });
 

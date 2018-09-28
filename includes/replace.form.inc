@@ -60,13 +60,9 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
   );
   $form['total'] = array(
   '#type' => 'markup',
-  '#markup' =>  "<p>". "Total number of items that match search: " . t(count(unserialize($find_replace['find_results']))) . "</p>",
+  '#markup' =>  "<p>Total number of items that match search: " . t(count(unserialize($find_replace['find_results']))) . "</p>",
 );
   $php_max_input_vars = ini_get('max_input_vars');
-  $form['warning'] = array(
-    '#type' => 'markup',
-    '#markup' => "<p></p>"
-  );
   $form['process_all'] =  array(
     '#type' => 'checkbox',
     '#title' => t("If set of selected results is larger than the limit of $php_max_input_vars items, you may process all items by checking this box."),

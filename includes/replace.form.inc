@@ -58,25 +58,45 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
     '#type' => 'markup',
     '#markup' => l(t('Back (New Search)'), 'admin/islandora/tools/find-replace/find'),
   );
+  $form['total'] = array(
+  '#type' => 'markup',
+  '#markup' =>  "<p>". "Total number of items that match search: " . t(count(unserialize($find_replace['find_results']))) . "</p>",
+);
+  $php_max_input_vars = ini_get('max_input_vars');
+  $form['warning'] = array(
+    '#type' => 'markup',
+    '#markup' => "<p>" . "If your set of items is larger than " . $php_max_input_vars . " you can use the 'Process All' button. Alternatively you should refine your search or only apply less than " . $php_max_input_vars . " items per batch</p>"
+  );
   $form['preview'] = array(
     '#type' => 'tableselect',
     '#header' => $header,
     '#options' => $options,
     '#empty' => l(t('No matching objects were found. Search again.'),
       'admin/islandora/tools/find-replace/find'),
-    '#js_select' => FALSE,
+    '#js_select' => TRUE,
+    '#attributes' => array('id' => 'selectall'),
   );
   $form['process_all'] =  array(
     '#type' => 'checkbox',
     '#title' => t('Check here to process all found results(cannot be undone!)'),
   );
-
   if (count($options)) {
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Replace String'),
     );
   }
+  $max_input_vars = array(
+   "maxInputVars" =>  ini_get("max_input_vars"),
+ );
+ $islandora_path = drupal_get_path('module', 'islandora');
+ $path = drupal_get_path('module', 'islandora_find_replace') . '/js/islandora_find_replace.js';
+ drupal_add_js(array("islandora_find_replace" => $max_input_vars), "setting");
+ $form['#attached']['js'][] = array(
+     'data' => $path,
+     'type' => 'file',
+     'scope' => 'footer',
+ );
 
   return $form;
 }

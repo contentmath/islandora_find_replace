@@ -67,15 +67,6 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
     '#type' => 'markup',
     '#markup' => "<p>" . "If your set of items is larger than " . $php_max_input_vars . " you can use the 'Process All' button. Alternatively you should refine your search or only apply less than " . $php_max_input_vars . " items per batch</p>"
   );
-  $form['preview'] = array(
-    '#type' => 'tableselect',
-    '#header' => $header,
-    '#options' => $options,
-    '#empty' => l(t('No matching objects were found. Search again.'),
-      'admin/islandora/tools/find-replace/find'),
-    '#js_select' => TRUE,
-    '#attributes' => array('id' => 'selectall'),
-  );
   $form['process_all'] =  array(
     '#type' => 'checkbox',
     '#title' => t('Check here to process all found results(cannot be undone!)'),
@@ -86,6 +77,15 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
       '#value' => t('Replace String'),
     );
   }
+  $form['preview'] = array(
+    '#type' => 'tableselect',
+    '#header' => $header,
+    '#options' => $options,
+    '#empty' => l(t('No matching objects were found. Search again.'),
+      'admin/islandora/tools/find-replace/find'),
+    '#js_select' => TRUE,
+    '#attributes' => array('id' => 'selectall'),
+  );
   $max_input_vars = array(
    "maxInputVars" =>  ini_get("max_input_vars"),
  );

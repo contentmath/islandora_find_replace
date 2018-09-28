@@ -25,7 +25,7 @@ const markup = `<div id="console" class="clearfix"><div id="find_replace_warning
         }
 
         else {
-          if(!messageExists){
+          if (!messageExists) {
             $('#content.clearfix').prepend(markup);
             $("form").submit(function (e) {
               e.preventDefault();

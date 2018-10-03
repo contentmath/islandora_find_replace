@@ -79,13 +79,11 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
     '#options' => $options,
     '#empty' => l(t('No matching objects were found. Search again.'),
       'admin/islandora/tools/find-replace/find'),
-    '#js_select' => TRUE,
     '#attributes' => array('class' => array('form-checkbox', 'in_tableselect')),
   );
   $max_input_vars = array(
-   "maxInputVars" =>  ini_get("max_input_vars"),
+   "maxInputVars" =>  $php_max_input_vars,
  );
- $islandora_path = drupal_get_path('module', 'islandora');
  $path = drupal_get_path('module', 'islandora_find_replace') . '/js/islandora_find_replace.js';
  drupal_add_js(array("islandora_find_replace" => $max_input_vars), "setting");
  $form['#attached']['js'][] = array(

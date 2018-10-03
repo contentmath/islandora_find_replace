@@ -65,7 +65,7 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
   $php_max_input_vars = ini_get('max_input_vars');
   $form['process_all'] =  array(
     '#type' => 'checkbox',
-    '#title' => t("If set of selected results is larger than the limit of $php_max_input_vars items, you may process all items by checking this box."),
+    '#title' => t("If selecting all checkboxes in the table below results in a warning, use this checkbox as an alternate means to 'select all'."),
   );
   if (count($options)) {
     $form['submit'] = array(
@@ -80,7 +80,7 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
     '#empty' => l(t('No matching objects were found. Search again.'),
       'admin/islandora/tools/find-replace/find'),
     '#js_select' => TRUE,
-    '#attributes' => array('class' => array('form-checkbox','in_tableselect')),
+    '#attributes' => array('class' => array('form-checkbox', 'in_tableselect')),
   );
   $max_input_vars = array(
    "maxInputVars" =>  ini_get("max_input_vars"),

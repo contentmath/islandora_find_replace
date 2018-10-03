@@ -4,7 +4,7 @@
  */
 
 const maxInputVars = Drupal.settings.islandora_find_replace.maxInputVars;
-const message = `You have selected more than the php variable max_input_vars will allow. Don't select over ${maxInputVars} items in the form!`;
+const message = `You have selected more checkboxes than this system can handle (max_input_vars: ${maxInputVars}).`;
 const markup = `<div id="console" class="clearfix"><div id="find_replace_warning" class="messages error"><h2 class="element-invisible">Status message</h2><pre>${message}</pre></div></div>`;
 
 (function ($) {

@@ -58,21 +58,40 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
     '#type' => 'markup',
     '#markup' => l(t('Back (New Search)'), 'admin/islandora/tools/find-replace/find'),
   );
-  $form['preview'] = array(
-    '#type' => 'tableselect',
-    '#header' => $header,
-    '#options' => $options,
-    '#empty' => l(t('No matching objects were found. Search again.'),
-      'admin/islandora/tools/find-replace/find'),
+  $count = (string) count(unserialize($find_replace['find_results']));
+  $form['total'] = array(
+    '#type' => 'markup',
+    '#markup' => "<p>Total number of items that match search: $count</p>",
   );
-
+  $php_max_input_vars = ini_get('max_input_vars');
+  $form['process_all'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("If selecting all checkboxes in the table below results in a warning, use this checkbox as an alternate means to 'select all'."),
+  );
   if (count($options)) {
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Replace String'),
     );
   }
-
+  $form['preview'] = array(
+    '#type' => 'tableselect',
+    '#header' => $header,
+    '#options' => $options,
+    '#empty' => l(t('No matching objects were found. Search again.'),
+      'admin/islandora/tools/find-replace/find'),
+    '#attributes' => array('class' => array('form-checkbox', 'in_tableselect')),
+  );
+  $max_input_vars = array(
+    "maxInputVars" => $php_max_input_vars,
+  );
+  $path = drupal_get_path('module', 'islandora_find_replace') . '/js/islandora_find_replace.js';
+  drupal_add_js(array("islandora_find_replace" => $max_input_vars), "setting");
+  $form['#attached']['js'][] = array(
+    'data' => $path,
+    'type' => 'file',
+    'scope' => 'footer',
+  );
   return $form;
 }
 
@@ -85,16 +104,18 @@ function islandora_find_replace_replace_form($form, &$form_state, $find_replace)
  *   The form state array.
  */
 function islandora_find_replace_replace_form_submit($form, &$form_state) {
-  $selected = array_keys(array_filter($form_state['values']['preview']));
+  $selected = $form_state['values']['process_all'] ? array_keys($form_state['values']['preview']) : array_keys(array_filter($form_state['values']['preview']));
 
   $operations = array();
   foreach ($selected as $select) {
-    $operations[] = array('islandora_find_replace_update_objects', array(
-      $select,
-      $form_state['storage']['find_replace']['dsid'],
-      $form_state['storage']['find_replace']['find'],
-      $form_state['storage']['find_replace']['replacement'],
-      $form_state['storage']['find_replace']['id']),
+    $operations[] = array('islandora_find_replace_update_objects',
+      array(
+        $select,
+        $form_state['storage']['find_replace']['dsid'],
+        $form_state['storage']['find_replace']['find'],
+        $form_state['storage']['find_replace']['replacement'],
+        $form_state['storage']['find_replace']['id'],
+      ),
     );
   }
   $batch = array(
